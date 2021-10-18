@@ -268,7 +268,7 @@ class Flow:
             packet: Packet to be parse as bulk
 
         """
-        payload_size = len(PacketCount.get_payload(packet))
+        payload_size = len(str(PacketCount.get_payload(packet)))
         if payload_size == 0:
             return
         if direction == PacketDirection.FORWARD:

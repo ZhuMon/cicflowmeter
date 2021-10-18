@@ -1,7 +1,9 @@
 import csv
+import time
 from collections import defaultdict
 
 from scapy.sessions import DefaultSession
+from scapy.all import wrpcap
 
 from .features.context.packet_direction import PacketDirection
 from .features.context.packet_flow_key import get_packet_flow_key
@@ -22,6 +24,7 @@ class FlowSession(DefaultSession):
         if self.output_mode == "flow":
             output = open(self.output_file, "w")
             self.csv_writer = csv.writer(output)
+            self.pcap_file = self.output_file[:-4]+'.pcap'
 
         self.packets_count = 0
 
@@ -53,6 +56,7 @@ class FlowSession(DefaultSession):
             return
 
         self.packets_count += 1
+        wrpcap(self.pcap_file, packet, append=True)
 
         # If there is no forward flow with a count of 0
         if flow is None:
@@ -81,9 +85,9 @@ class FlowSession(DefaultSession):
                     flow = Flow(packet, direction)
                     self.flows[(packet_flow_key, count)] = flow
                     break
-        elif "F" in str(packet.flags):
+        elif "TCP" in packet and "F" in str(packet.flags):
             # If it has FIN flag then early collect flow and continue
-            flow.add_packet(packet.flags)
+            flow.add_packet(packet, direction)
             self.garbage_collect(packet.time)
             return
 
@@ -101,6 +105,8 @@ class FlowSession(DefaultSession):
         return self.flows.values()
 
     def garbage_collect(self, latest_time) -> None:
+        localtime = time.asctime( time.localtime(time.time()) )
+        print(localtime, latest_time)
         # TODO: Garbage Collection / Feature Extraction should have a separate thread
         if not self.url_model:
             print("Garbage Collection Began. Flows = {}".format(len(self.flows)))
