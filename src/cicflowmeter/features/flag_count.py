@@ -32,6 +32,6 @@ class FlagCount:
         )
 
         for packet in packets:
-            if flag[0] in str(packet.flags):
+            if flag in str(packet.flags):
                 return 1
         return 0
