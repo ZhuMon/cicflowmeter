@@ -24,10 +24,10 @@ class PacketTime:
         if self.packet_times is not None:
             return self.packet_times
         first_packet_time = self.flow.packets[0][0].time
-        packet_times = [
+        self.packet_times = [
             float(packet.time - first_packet_time) for packet, _ in self.flow.packets
         ]
-        return packet_times
+        return self.packet_times
 
     def get_packet_iat(self, packet_direction=None):
         if packet_direction is not None:
