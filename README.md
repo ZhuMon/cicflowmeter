@@ -7,7 +7,7 @@
 ```sh
 git clone https://gitlab.com/hieulw/cicflowmeter
 cd cicflowmeter
-python setup.py install
+sudo python3 setup.py install
 ```
 
 ### Usage
